@@ -5,7 +5,7 @@ import time
 import sys
 
 # config
-NODES=['10.0.0.{}'.format(x) for x in range(3,11)]
+NODES = [f'10.0.0.{x}' for x in range(3,11)]
 partition_cmd = './partition.sh {} {} {} &'
 TIMEOUT=150
 # running experiments
@@ -17,16 +17,14 @@ ENV='env.sh'
 NNODES=[4,8,16]
 
 def change_config(run_no):
-  f = open(ENV,'r')
-  envs = f.readlines()
-  f.close()
-  f = open(ENV,'w')
-  for l in envs:
-    if l.startswith('LOG_DIR'):
-      f.write(l[:l.find('results')]+'results_'+str(run_no)+'\n')
-    else:
-      f.write(l)
-  f.close()
+  with open(ENV,'r') as f:
+    envs = f.readlines()
+  with open(ENV,'w') as f:
+    for l in envs:
+      if l.startswith('LOG_DIR'):
+        f.write(l[:l.find('results')]+'results_'+str(run_no)+'\n')
+      else:
+        f.write(l)
 
 def run_exp(n, is_security=False):
   cmd='./run-bench.sh {} {} {} {}'

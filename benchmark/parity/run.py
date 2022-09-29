@@ -7,7 +7,7 @@ from partition import partition
 import time
 def start_parity():
   # generate scripts
-  os.system('python gen_config.py {}'.format(len(NODES)))
+  os.system(f'python gen_config.py {len(NODES)}')
   parity_script = '. {}/start_parity.sh {} {} {} {} {}'
   count=1
   for node in NODES:
@@ -54,30 +54,29 @@ def kill():
     os.system(kill_command.format(node, 'parity'))
 
 def run_exp(log_file, threads, rates, sleep_time, is_security=False, dropping=False, workload='ycsb'):
-    start_parity()
-    time.sleep(20)
-    add_peers()
-    time.sleep(30)
-    start_clients(threads, rates, log_file, workload)
-    if (not is_security) and (not dropping):
-      time.sleep(sleep_time)
-    else:
-      if is_security:
-        # for security part
-        time.sleep(100)
-        partition(NODES, TIMEOUT)
-        time.sleep(sleep_time-100-TIMEOUT)
-      else: # is dropping
-        time.sleep(250)
-        drop(NODES, 4)
-        time.sleep(sleep_time-250)
-    kill()
-    time.sleep(5)
+  start_parity()
+  time.sleep(20)
+  add_peers()
+  time.sleep(30)
+  start_clients(threads, rates, log_file, workload)
+  if is_security:
+    # for security part
+    time.sleep(100)
+    partition(NODES, TIMEOUT)
+    time.sleep(sleep_time-100-TIMEOUT)
+  elif dropping:
+    time.sleep(250)
+    drop(NODES, 4)
+    time.sleep(sleep_time-250)
+  else:
+    time.sleep(sleep_time)
+  kill()
+  time.sleep(5)
 
 def driver(is_security=False, is_fixed=False, is_drop=False, workload='ycsb'):
   global NODES, CLIENTS #ugly hack
   tmp_nodes = NODES
-  tmp_clients = CLIENTS 
+  tmp_clients = CLIENTS
   if is_fixed or is_drop:
     tmp_clients = CLIENTS[:8]
 
@@ -91,10 +90,10 @@ def driver(is_security=False, is_fixed=False, is_drop=False, workload='ycsb'):
       nclients = 8
 
     CLIENTS = tmp_clients[:(nclients/2)] + tmp_clients[:(nclients/2)]
-    print NODES
-    print CLIENTS
+    NODES = tmp_nodes[:n]
+    NODES = tmp_nodes[:n]
     if sys.argv[1]=='start':
-      os.system('mkdir -p {}'.format(CLIENT_LOG))
+      os.system(f'mkdir -p {CLIENT_LOG}')
       for t in THREADS:
         for r in RATES: 
           run_exp(CLIENT_LOG, t, r, 500, is_security, is_drop, workload)

@@ -1,7 +1,7 @@
 NS=[8]
-NODES=['10.0.0.{}'.format(x) for x in range(3,36)]
+NODES = [f'10.0.0.{x}' for x in range(3,36)]
 
-CLIENTS=['10.0.0.{}'.format(x) for x in range(85,101)]
+CLIENTS = [f'10.0.0.{x}' for x in range(85,101)]
 PORT='8545'
 THREADS=[8]
 RATES=[1,2,4,8,16]
